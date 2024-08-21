@@ -24,7 +24,7 @@ KIC_VERSION ?= $(shell grep -E "Version =" pkg/drivers/kic/types.go | cut -d \" 
 HUGO_VERSION ?= $(shell grep -E "HUGO_VERSION = \"" netlify.toml | cut -d \" -f2)
 
 # Default to .0 for higher cache hit rates, as build increments typically don't require new ISO versions
-ISO_VERSION ?= v1.33.1-1715594774-18869
+ISO_VERSION ?= v1.33.1-1723740674-19452
 
 # Dashes are valid in semver, but not Linux packaging. Use ~ to delimit alpha/beta
 DEB_VERSION ?= $(subst -,~,$(RAW_VERSION))
@@ -35,7 +35,7 @@ RPM_REVISION ?= 0
 
 # used by hack/jenkins/release_build_and_upload.sh and KVM_BUILD_IMAGE, see also BUILD_IMAGE below
 # update this only by running `make update-golang-version`
-GO_VERSION ?= 1.22.3
+GO_VERSION ?= 1.22.5
 # update this only by running `make update-golang-version`
 GO_K8S_VERSION_PREFIX ?= v1.31.0
 
@@ -79,7 +79,7 @@ MINIKUBE_RELEASES_URL=https://github.com/kubernetes/minikube/releases/download
 KERNEL_VERSION ?= 5.10.207
 # latest from https://github.com/golangci/golangci-lint/releases
 # update this only by running `make update-golint-version`
-GOLINT_VERSION ?= v1.58.1
+GOLINT_VERSION ?= v1.60.1
 # Limit number of default jobs, to avoid the CI builds running out of memory
 GOLINT_JOBS ?= 4
 # see https://github.com/golangci/golangci-lint#memory-usage-of-golangci-lint
@@ -105,6 +105,15 @@ PYTHON := $(shell command -v python || echo "docker run --rm -it -v $(shell pwd)
 BUILD_OS := $(shell uname -s)
 
 SHA512SUM=$(shell command -v sha512sum || echo "shasum -a 512")
+
+# check which "flavor" of SED is being used as the flags are different between BSD and GNU sed.
+# BSD sed does not support "--version"
+SED_VERSION := $(shell sed --version 2>/dev/null | head -n 1 | cut -d' ' -f4)
+ifeq ($(SED_VERSION),)
+	SED = sed -i ''
+else
+	SED = sed -i
+endif
 
 # gvisor tag to automatically push changes to
 # to update minikubes default, update deploy/addons/gvisor
@@ -728,10 +737,6 @@ local-kicbase: ## Builds the kicbase image and tags it local/kicbase:latest and 
 	docker tag local/kicbase:$(KIC_VERSION) local/kicbase:latest
 	docker tag local/kicbase:$(KIC_VERSION) local/kicbase:$(KIC_VERSION)-$(COMMIT_SHORT)
 
-SED = sed -i
-ifeq ($(GOOS),darwin)
-	SED = sed -i ''
-endif
 
 .PHONY: local-kicbase-debug
 local-kicbase-debug: local-kicbase ## Builds a local kicbase image and switches source code to point to it
@@ -1197,6 +1202,11 @@ update-registry-version:
 	(cd hack/update/registry_version && \
 	 go run update_registry_version.go)
 
+.PHONY: update-volcano-version
+update-volcano-version:
+	(cd hack/update/volcano_version && \
+	 go run update_volcano_version.go)
+
 .PHONY: update-kong-version
 update-kong-version:
 	(cd hack/update/kong_version && \
@@ -1231,6 +1241,11 @@ update-site-node-version:
 update-cilium-version:
 	(cd hack/update/cilium_version && \
 	 go run update_cilium_version.go)
+
+.PHONY: update-yakd-version
+update-yakd-version:
+	(cd hack/update/yakd_version && \
+	 go run update_yakd_version.go)
 
 .PHONY: get-dependency-verison
 get-dependency-version:
