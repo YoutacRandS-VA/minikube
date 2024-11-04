@@ -4,10 +4,9 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "15 minutes"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-    ignore:
-      - dependency-name: "vedantmgoyal2009/winget-releaser"
+      interval: "15 minutes"
+  
