@@ -28,9 +28,10 @@ readonly bucket="minikube-builds"
 # Make sure the right golang version is installed based on Makefile
 ./hack/jenkins/installers/check_install_golang.sh /usr/local
 
+sudo apt-get -y install fakeroot
 
 declare -rx BUILD_IN_DOCKER=y
-declare -rx GOPATH=/var/lib/jenkins/go
+declare -rx GOPATH="$HOME/go"
 declare -rx ISO_BUCKET="${bucket}/${ghprbPullId}"
 declare -rx ISO_VERSION="testing"
 declare -rx TAG="${ghprbActualCommit}"

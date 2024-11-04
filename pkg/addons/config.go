@@ -75,11 +75,6 @@ var Addons = []*Addon{
 		callbacks:   []setFn{EnableOrDisableAddon, verifyAddonStatus},
 	},
 	{
-		name:      "helm-tiller",
-		set:       SetBool,
-		callbacks: []setFn{EnableOrDisableAddon},
-	},
-	{
 		name:      "ingress",
 		set:       SetBool,
 		callbacks: []setFn{EnableOrDisableAddon, verifyAddonStatus},
@@ -135,6 +130,11 @@ var Addons = []*Addon{
 		set:         SetBool,
 		validations: []setFn{isKVMDriverForNVIDIA},
 		callbacks:   []setFn{EnableOrDisableAddon},
+	},
+	{
+		name:      "amd-gpu-device-plugin",
+		set:       SetBool,
+		callbacks: []setFn{EnableOrDisableAddon},
 	},
 	{
 		name:      "olm",
